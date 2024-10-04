@@ -7,9 +7,9 @@ from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 
 # Télécharger les ressources nécessaires de nltk
-nltk.download("stopwords")
-nltk.download("punkt")
-nltk.download("wordnet")
+nltk.download("stopwords", quiet=True)
+nltk.download("punkt", quiet=True)
+nltk.download("wordnet", quiet=True)
 
 # Charger le modèle et le vectoriseur
 log_reg = joblib.load("ML/logistic_regression_model.pkl")
@@ -50,29 +50,34 @@ def clean_text(text):
 def predict_user_reviews(uploaded_file):
     if uploaded_file is not None:
         # Lecture du fichier CSV
-        print("1")
-        data = pd.read_csv(uploaded_file)
-        print("2")
-        # Vérifier que la colonne 'user_review' existe
-        if "user_review" in data.columns:
-            # Nettoyer les critiques utilisateur
-            print("3")
-            data["cleaned_user_review"] = data["user_review"].apply(clean_text)
-
-            # Vectoriser les critiques utilisateur nettoyées
-            X = tfidf_vectorizer.transform(data["cleaned_user_review"])
-
-            # Faire des prédictions
-            predictions = log_reg.predict(X)
-            print("5")
-            # Ajouter les prédictions au DataFrame
-            data["predictions"] = predictions
-
-            # Calculer les pourcentages de prédictions positives et négatives
-            positive_percentage = (predictions == 1).mean() * 100
-            negative_percentage = (predictions == 0).mean() * 100
-
-            return data, positive_percentage, negative_percentage
-        else:
+        try:
+            data = pd.read_csv(uploaded_file)
+        except Exception as e:
+            print(f"Erreur lors de la lecture du fichier : {e}")
             return None, None, None
-    return None, None, None
+
+        # Vérifier que la colonne 'user_review' existe
+        if "user_review" not in data.columns:
+            print("Erreur : La colonne 'user_review' est manquante.")
+            return None, None, None
+
+        # Nettoyer les critiques utilisateur
+        data["cleaned_user_review"] = data["user_review"].apply(clean_text)
+
+        # Vectoriser les critiques utilisateur nettoyées
+        X = tfidf_vectorizer.transform(data["cleaned_user_review"])
+
+        # Faire des prédictions
+        predictions = log_reg.predict(X)
+
+        # Ajouter les prédictions au DataFrame
+        data["predictions"] = predictions
+
+        # Calculer les pourcentages de prédictions positives et négatives
+        positive_percentage = (predictions == 1).mean() * 100
+        negative_percentage = (predictions == 0).mean() * 100
+
+        return data, positive_percentage, negative_percentage
+    else:
+        print("Aucun fichier uploadé.")
+        return None, None, None
