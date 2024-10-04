@@ -65,3 +65,10 @@ def presentation_et_objectif():
 
     st.write("Dataset après scrapping")
     st.write(df)
+    # Ajouter un lien dans la sidebar
+    st.sidebar.markdown(
+        """
+        ## Documentation
+        [Visit the Documentation](https://cedric-2.gitbook.io/videosgames-sales-predictions/)
+        """
+    )
