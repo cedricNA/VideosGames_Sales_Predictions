@@ -6,9 +6,10 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 
+
 # Télécharger les ressources nécessaires de nltk
 nltk.download("stopwords", quiet=True)
-nltk.download("punkt", quiet=True)
+nltk.download("punkt_tab", quiet=True)
 nltk.download("wordnet", quiet=True)
 
 # Charger le modèle et le vectoriseur
